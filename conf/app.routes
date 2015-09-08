@@ -1,0 +1,7 @@
+POST        /download/:downloadDate         controllers.EMISReportController.download(downloadDate: String, chunkSize: Option[Int], force: Option[Boolean])
+GET         /nextScheduledDate              controllers.ConsoleController.getNextScheduleDate
+GET         /lock                           controllers.ConsoleController.getLockStatus
+DELETE      /lock                           controllers.ConsoleController.releaseLock
+GET         /processed/:downloadDate        controllers.ConsoleController.getProcessedStatus(downloadDate: String)
+POST        /processed/:downloadDate        controllers.ConsoleController.downloadAndProcessWithLock(downloadDate: String)
+POST        /scheduler                      controllers.ConsoleController.initScheduler
