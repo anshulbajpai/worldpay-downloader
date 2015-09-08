@@ -32,7 +32,7 @@ trait MicroService {
       fork in Test := false,
       retrieveManaged := true
     )
-    .settings(testOptions in Test := Seq(Tests.Filter(unitFilter), Tests.Argument("-l", "Vagrant")))
+    .settings(testOptions in Test ++= Seq(Tests.Filter(unitFilter), Tests.Argument("-l", "Vagrant")))
     .configs(IntegrationTest)
     .settings(inConfig(IntegrationTest)(Defaults.itSettings) : _*)
     .settings(
