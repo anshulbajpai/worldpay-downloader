@@ -211,57 +211,62 @@ Feature: Parse and send the EMIS report to RCS
     | 11010000    | 33333333     | Self Assessment |
     | 12010000    | 55555555     | VAT             |
 
+# Note that there are mix of transaction dates - some before the commission rate rise from 1.4% to 1.5%, some after.
+# The date 311015 (ddMMyy) is 31 October 2015; we then send it to RCS as yyDDD (the year, then the day of the year), which would be 15304; we expect a credit card rate of 1.4%
+# The date 021115 (ddMMyy) is 2 November 2015; we then send it to RCS as yyDDD (the year, then the day of the year), which would be 15306; we expect a credit card rate of 1.5%
+# The following scenario might be a bit tricky to follow, but keep in mind that only payment 15 (reference: 345726781MA) is subject to the 1.5%; payment 2 is passed
+# the switch date but is a debit card payment, so not relevant.
 
-  @logs
+  @logs @YTA-1122
   Scenario: Successful RCS payments transmission for multiple chunks
-    Given a Report "MA.PISCESSW.#M.RECON.HMRE.D010114" is available for download on WorldPay containing
+    Given a Report "MA.PISCESSW.#M.RECON.HMRE.D021115" is available for download on WorldPay containing
     """
          |000000000100000000009210000001000000010000000000000000000000000000003334520000000000000000000000000000100000000000000000008000000000000000111050002002
          |050000000200000001550650000001000000000000000000000000000000000000000096000000000000000000000000000000000000000000000000000600000000000000
          |10000000030000011010000140411110415000000000000000000000000000000000000000096000000000000000000000000000000000000000000000000000400000000000000
-         |1500000004465935******7108   1506000000025000101141158000E041920A                            ADE000
+         |1500000004465935******7108   1506000000025003110151158000E041920A                            ADE000
          |160000000580729310000000000000K1234567890K-1234560
-         |1500000006465935******7108   1506000000026000101141158000E041920A                            ADE000
+         |1500000006465935******7108   1506000000026000211151158000E041920A                            ADE000
          |160000000780729310000000000000K1234567890K-1234560
-         |1500000006465935******7108   1506000000027000101141158000E041920A                            ADE000
+         |1500000006465935******7108   1506000000027003110151158000E041920A                            ADE000
          |160000000780729310000000000000K1234567890K-1234560
-         |1500000006465935******7108   1506000000028000101141158000E041920A                            ADE000
+         |1500000006465935******7108   1506000000028003110151158000E041920A                            ADE000
          |160000000780729310000000000000K1234567890K-1234560
          |10000000030000012010000140411110415000000000000000000000000000000000000000096000000000000000000000000000000000000000000000000000100000000000000
-         |1500000006465935******7108   1506000000030000101141158000E041920A                            ADE000
+         |1500000006465935******7108   1506000000030003110151158000E041920A                            ADE000
          |160000000780729310000000000000V1234567891014-Y5RY0
          |10000000030000013010000140411110415000000000000000000000000000000000000000096000000000000000000000000000000000000000000000000000100000000000000
-         |1500000006465935******7108   1506000000044440101141158000E041920A                            ADE000
+         |1500000006465935******7108   1506000000044443110151158000E041920A                            ADE000
          |160000000780729310000000000000A109717256408A-TTTT0
          |10000000030000014010000140411110415000000000000000000000000000000000000000096000000000000000000000000000000000000000000000000000100000000000000
-         |1500000006465935******7108   1506000000135790101141158000E041920A                            ADE000
+         |1500000006465935******7108   1506000000135793110151158000E041920A                            ADE000
          |160000000780729310000000000000PRPR823ILT16C-7AYSA0
-         |1500000006465935******7108   1506000000125790101141158000E041920A                            ADE000
+         |1500000006465935******7108   1506000000125793110151158000E041920A                            ADE000
          |160000000780729310000000000000PFBO0T5QKG2RC-YAYSA0
          |10000000000000015010000140411000000000000000000000000000000000000000000479295360000000000000000000000000000000000000000000000001000000000000000
-         |1500000000000000******0000   00000000639521101011400000000000000A                            000000
+         |1500000000000000******0000   00000000639521131101500000000000000A                            000000
          |160000000000000000000000000000XC000843562584-8YSB0
-         |1500000000000000******0000   00000000498261401011400000000000000A                            000000
+         |1500000000000000******0000   00000000498261431101500000000000000A                            000000
          |160000000000000000000000000000XG001445528149-8YSG0
          |10000000000000015020000140411000000000000000000000000000000000000000000047353320000000000000000000000000000000000000000000000000200000000000000
-         |1500000000000000******0000   00000000317334901011400000000000000A                            000000
+         |1500000000000000******0000   00000000317334931101500000000000000A                            000000
          |160000000000000000000000000000XC000843562584-B2YS0
-         |1500000000000000******0000   00000000156198301011400000000000000A                            000000
+         |1500000000000000******0000   00000000156198331101500000000000000A                            000000
          |160000000000000000000000000000XG001445528149-B2YZ0
          |10000000000000016010000140411000000000000000000000000000000000000000000479295360000000000000000000000000000000000000000000000001000000000000000
-         |1500000000000000******0000   00000000440521101011400000000000000A                            000000
+         |1500000000000000******0000   00000000440521131101500000000000000A                            000000
          |160000000000000000000000000000M123456789MA-ABB2YZ0
-         |1500000000000000******0000   00000000228661401011400000000000000A                            000000
+         |1500000000000000******0000   00000000228661402111500000000000000A                            000000
          |160000000000000000000000000000M680686481MW-ABB2YZ0
          |10000000000000016020000140411000000000000000000000000000000000000000000479295360000000000000000000000000000000000000000000000001000000000000000
-         |1500000000000000******0000   00000000240561101011400000000000000A                            000000
+         |1500000000000000******0000   00000000240561102111500000000000000A                            000000
          |160000000000000000000000000000M345726781MA-XYB2YZ0
-         |1500000000000000******0000   00000000428641401011400000000000000A                            000000
+         |1500000000000000******0000   00000000428641431101500000000000000A                            000000
          |160000000000000000000000000000M680686481MW-OOD2YZ0
          """
 
 
-    When I trigger the download with chunk size "2" for the date "2014/01/01"
+    When I trigger the download with chunk size "2" for the date "2015/11/02"
     Then a POST to the RCS Initiate Payment Transmission through HodsApi endpoint "/payments/worldpay/[^/]+" is sent exactly once
     And a POST to the RCS Send Transaction Information through HodsApi endpoint "/payments/worldpay/.*/chunks/.*" is sent exactly 8 times
     And a POST to the RCS Send Transaction Information through HodsApi endpoint "/payments/worldpay/.*/chunks/1" is sent with payload:
@@ -270,7 +275,7 @@ Feature: Parse and send the EMIS report to RCS
         "payments": [
           {
             "consecNumber": 1,
-            "date": "14001",
+            "date": "15304",
             "paymentProviderId": "1234567890KK1234567890K-1234560",
             "paymentItems": [
               {
@@ -283,7 +288,7 @@ Feature: Parse and send the EMIS report to RCS
           },
           {
             "consecNumber": 2,
-            "date": "14001",
+            "date": "15306",
             "paymentProviderId": "1234567890KK1234567890K-1234560",
             "paymentItems": [
               {
@@ -303,7 +308,7 @@ Feature: Parse and send the EMIS report to RCS
         "payments": [
           {
             "consecNumber": 3,
-            "date": "14001",
+            "date": "15304",
             "paymentProviderId": "1234567890KK1234567890K-1234560",
             "paymentItems": [
               {
@@ -316,7 +321,7 @@ Feature: Parse and send the EMIS report to RCS
           },
           {
             "consecNumber": 4,
-            "date": "14001",
+            "date": "15304",
             "paymentProviderId": "1234567890KK1234567890K-1234560",
             "paymentItems": [
               {
@@ -336,7 +341,7 @@ Feature: Parse and send the EMIS report to RCS
         "payments": [
           {
             "consecNumber": 5,
-            "date": "14001",
+            "date": "15304",
             "paymentProviderId": "1234567891014V1234567891014-Y5RY0",
             "paymentItems": [
               {
@@ -349,7 +354,7 @@ Feature: Parse and send the EMIS report to RCS
           },
           {
             "consecNumber": 6,
-            "date": "14001",
+            "date": "15304",
             "paymentProviderId": "1097172564A00108AA109717256408A-TTTT0",
             "paymentItems": [
               {
@@ -369,7 +374,7 @@ Feature: Parse and send the EMIS report to RCS
         "payments": [
           {
             "consecNumber": 7,
-            "date": "14001",
+            "date": "15304",
             "paymentProviderId": "997PR375966LT4212PRPR823ILT16C-7AYSA0",
             "paymentItems": [
               {
@@ -382,7 +387,7 @@ Feature: Parse and send the EMIS report to RCS
           },
           {
             "consecNumber": 8,
-            "date": "14001",
+            "date": "15304",
             "paymentProviderId": "551PO037790KG9912PFBO0T5QKG2RC-YAYSA0",
             "paymentItems": [
               {
@@ -402,7 +407,7 @@ Feature: Parse and send the EMIS report to RCS
         "payments": [
           {
             "consecNumber": 9,
-            "date": "14001",
+            "date": "15304",
             "paymentProviderId": "XC000843562584XC000843562584-8YSB0",
             "paymentItems": [
               {
@@ -415,7 +420,7 @@ Feature: Parse and send the EMIS report to RCS
           },
           {
             "consecNumber": 10,
-            "date": "14001",
+            "date": "15304",
             "paymentProviderId": "XG001445528149XG001445528149-8YSG0",
             "paymentItems": [
               {
@@ -435,7 +440,7 @@ Feature: Parse and send the EMIS report to RCS
         "payments": [
           {
             "consecNumber": 11,
-            "date": "14001",
+            "date": "15304",
             "paymentProviderId": "XC000843562584XC000843562584-B2YS0",
             "paymentItems": [
               {
@@ -454,7 +459,7 @@ Feature: Parse and send the EMIS report to RCS
           },
           {
             "consecNumber": 12,
-            "date": "14001",
+            "date": "15304",
             "paymentProviderId": "XG001445528149XG001445528149-B2YZ0",
             "paymentItems": [
               {
@@ -480,7 +485,7 @@ Feature: Parse and send the EMIS report to RCS
         "payments": [
           {
             "consecNumber": 13,
-            "date": "14001",
+            "date": "15304",
             "paymentProviderId": "123456789MAM123456789MA-ABB2YZ0",
             "paymentItems": [
               {
@@ -493,7 +498,7 @@ Feature: Parse and send the EMIS report to RCS
           },
           {
             "consecNumber": 14,
-            "date": "14001",
+            "date": "15306",
             "paymentProviderId": "680686481MWM680686481MW-ABB2YZ0",
             "paymentItems": [
               {
@@ -513,26 +518,26 @@ Feature: Parse and send the EMIS report to RCS
         "payments": [
           {
             "consecNumber": 15,
-            "date": "14001",
+            "date": "15306",
             "paymentProviderId": "345726781MAM345726781MA-XYB2YZ0",
             "paymentItems": [
               {
                   "transactionType": "26",
                   "destinationAccountNumber": "33333333",
-                  "amount": 2372397,
+                  "amount": 2370060,
                   "reference": "345726781MA"
               },
                {
                   "transactionType": "27",
                   "destinationAccountNumber": "33333333",
-                  "amount": 33214,
+                  "amount": 35551,
                   "reference": "345726781MA"
               }
             ]
           },
           {
             "consecNumber": 16,
-            "date": "14001",
+            "date": "15304",
             "paymentProviderId": "680686481MWM680686481MW-OOD2YZ0",
             "paymentItems": [
               {
@@ -640,7 +645,7 @@ Feature: Parse and send the EMIS report to RCS
               [
                 {
                   "transactionType":"26",
-                  "totalValue":6599630,
+                  "totalValue":6597293,
                   "numberOfPayments":2
                 }
               ]
@@ -648,7 +653,6 @@ Feature: Parse and send the EMIS report to RCS
           ]
         }
         """
-  #
 
   Scenario: Empty downloaded EMIS reports cause no interaction with RCS
     Given an empty Report "MA.PISCESSW.#M.RECON.HMRE.D010114" is available for download on WorldPay

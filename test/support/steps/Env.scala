@@ -22,6 +22,8 @@ import java.nio.file.{StandardOpenOption, Files}
 import com.github.tomakehurst.wiremock.client.WireMock
 import cucumber.api.Scenario
 import cucumber.api.scala.{EN, ScalaDsl}
+import fun.FeatureSuite
+import org.junit.BeforeClass
 
 
 object Env extends ScalaDsl with EN with Stubs {
@@ -35,7 +37,9 @@ object Env extends ScalaDsl with EN with Stubs {
   lazy val sftpRoot = Files.createTempDirectory("sftp-root").toFile
   lazy val logFile = new File("logs", "worldpay-downloader.log")
 
+
   Before { scenario =>
+    FeatureSuite.ensureSetup
     markScenarioStartInLogFile(scenario)
     stubFor(Auditing)
   }

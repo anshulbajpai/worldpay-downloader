@@ -48,6 +48,13 @@ object FeatureSuite extends StubApplicationConfiguration {
 
   private lazy val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
 
+  private var isSetup = false
+
+  /**
+   * Apparently necessary for running individual features from within IntelliJ.
+   */
+  def ensureSetup = if (!isSetup) setup()
+
   @BeforeClass
   def setup() {
     configureTestServerLogger()
@@ -55,6 +62,7 @@ object FeatureSuite extends StubApplicationConfiguration {
     WireMock.configureFor(stubHost, stubPort)
     EmbeddedSFTPServer.startServer(sftpRoot)
     testServer.start()
+    isSetup = true
   }
 
   @AfterClass
