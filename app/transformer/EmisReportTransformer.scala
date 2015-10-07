@@ -57,8 +57,7 @@ class EmisReportTransformer(merchants: Merchants) {
     val merchantOpt = merchants.withMerchantId(merchantId)
     val paymentItems = merchantOpt match {
       case Some(m) if m.isCreditCard =>
-        val commission = Commission(Pence(merchantTransaction.transaction.data.amountInPence))
-
+        val commission = Commission(Pence(merchantTransaction.transaction.data.amountInPence), merchantTransaction.transaction.data.date)
         List(RcsPaymentItem(
           RcsPaymentItem.HodPayment,
           destinationAccountNumber = m.accountNumber,

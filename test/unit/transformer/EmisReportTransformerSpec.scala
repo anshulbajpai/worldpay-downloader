@@ -29,6 +29,8 @@ class EmisReportTransformerSpec extends UnitSpec with EmisReportGenerator with L
 
   val emisReportTransformer =  new EmisReportTransformer(merchants)
 
+  val November_1_2015 = new LocalDate(2015, 11, 1)
+  val November_2_2015 = new LocalDate(2015, 11, 2)
 
   "Transforming a report with a single payment" should {
 
@@ -209,10 +211,10 @@ class EmisReportTransformerSpec extends UnitSpec with EmisReportGenerator with L
       )
     }
 
-    "create multiple payments items for a credit card transaction as it has commission" in {
+    "when the transaction dates are all before 2 November, 2015, create multiple payments items for a credit card transaction, ensuring the right commission (1.4%)" in {
       val emisReport = createTransactions(
-        merchants.SelfAssessmentForCreditCard.merchantId -> Seq(transaction(amount = 37, ref = "K9876543210K-9999990")),
-        merchants.VatForCreditCard.merchantId            -> Seq(transaction(amount = 2341691, ref = "V1234567891014-Y5RY0"))
+        merchants.SelfAssessmentForCreditCard.merchantId -> Seq(transaction(amount = 37, ref = "K9876543210K-9999990", date = November_1_2015)),
+        merchants.VatForCreditCard.merchantId            -> Seq(transaction(amount = 2341691, ref = "V1234567891014-Y5RY0", date = November_1_2015))
       )
 
       val rcsChunks = emisReportTransformer.toRcsChunks(emisReport, chunkSize = 400).map(_._1).toSeq
@@ -233,6 +235,65 @@ class EmisReportTransformerSpec extends UnitSpec with EmisReportGenerator with L
         RcsPaymentItem(transactionType = "27", destinationAccountNumber = vatAccountNumber, amount = Pence(32331), reference = "1234567891014")
       )
     }
+
+    "when the transaction date are all on 2 November, 2015, create multiple payments items for a credit card transaction, ensuring the right commission (1.5%)" in {
+      val emisReport = createTransactions(
+        merchants.SelfAssessmentForCreditCard.merchantId -> Seq(transaction(amount = 233621, ref = "K9876543210K-9999990", date = November_2_2015)),
+        merchants.VatForCreditCard.merchantId            -> Seq(transaction(amount = 10007900, ref = "V1234567891014-Y5RY0", date = November_2_2015))
+      )
+
+      val rcsChunks = emisReportTransformer.toRcsChunks(emisReport, chunkSize = 400).map(_._1).toSeq
+
+      rcsChunks(0).payments.size should be(2)
+
+      val saAccountNumber = merchantMap("sa").account
+
+      rcsChunks(0).payments(0).paymentItems should contain theSameElementsInOrderAs Seq(
+        RcsPaymentItem(transactionType = "26", destinationAccountNumber = saAccountNumber, amount = Pence(233621 - 3453), reference = "9876543210K"),
+        RcsPaymentItem(transactionType = "27", destinationAccountNumber = saAccountNumber, amount = Pence(3453), reference = "9876543210K")
+      )
+
+      val vatAccountNumber = merchantMap("vat").account
+
+      rcsChunks(0).payments(1).paymentItems should contain theSameElementsInOrderAs Seq(
+        RcsPaymentItem(transactionType = "26", destinationAccountNumber = vatAccountNumber, amount = Pence(10007900 - 147900), reference = "1234567891014"),
+        RcsPaymentItem(transactionType = "27", destinationAccountNumber = vatAccountNumber, amount = Pence(147900), reference = "1234567891014")
+      )
+    }
+
+
+    "when some of the transaction dates are before 2 November, 2015, and some after, create multiple payments items for a credit card transaction, ensuring the right commission" in {
+      val emisReport = createTransactions(
+        merchants.SelfAssessmentForCreditCard.merchantId -> Seq(transaction(amount = 216119, ref = "K9876543210K-9999990", date = November_1_2015)),
+        merchants.SelfAssessmentForCreditCard.merchantId -> Seq(transaction(amount = 7735894, ref = "K9876543211K-9999990", date = November_1_2015)),
+        merchants.VatForCreditCard.merchantId            -> Seq(transaction(amount = 10007900, ref = "V1234567891014-Y5RY0", date = November_2_2015))
+      )
+
+      val rcsChunks = emisReportTransformer.toRcsChunks(emisReport, chunkSize = 400).map(_._1).toSeq
+
+      rcsChunks(0).payments.size should be(3)
+
+      val saAccountNumber = merchantMap("sa").account
+
+      rcsChunks(0).payments(0).paymentItems should contain theSameElementsInOrderAs Seq(
+        RcsPaymentItem(transactionType = "26", destinationAccountNumber = saAccountNumber, amount = Pence(216119 - 2984), reference = "9876543210K"),
+        RcsPaymentItem(transactionType = "27", destinationAccountNumber = saAccountNumber, amount = Pence(2984), reference = "9876543210K")
+      )
+
+
+      rcsChunks(0).payments(1).paymentItems should contain theSameElementsInOrderAs Seq(
+        RcsPaymentItem(transactionType = "26", destinationAccountNumber = saAccountNumber, amount = Pence(7735894 - 106807), reference = "9876543211K"),
+        RcsPaymentItem(transactionType = "27", destinationAccountNumber = saAccountNumber, amount = Pence(106807), reference = "9876543211K")
+      )
+
+      val vatAccountNumber = merchantMap("vat").account
+
+      rcsChunks(0).payments(2).paymentItems should contain theSameElementsInOrderAs Seq(
+        RcsPaymentItem(transactionType = "26", destinationAccountNumber = vatAccountNumber, amount = Pence(10007900 - 147900), reference = "1234567891014"),
+        RcsPaymentItem(transactionType = "27", destinationAccountNumber = vatAccountNumber, amount = Pence(147900), reference = "1234567891014")
+      )
+    }
+
 
     "convert corporation tax payments" in {
 

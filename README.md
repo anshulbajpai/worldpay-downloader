@@ -13,6 +13,12 @@ To compile the application and run the tests execute
 sbt clean test it:test fun:test
 ```
 
+or
+
+```
+run-all-tests.sh
+```
+
 
 ## Run the application
 
