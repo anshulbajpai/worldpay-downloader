@@ -21,8 +21,8 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.config.AppName
 import uk.gov.hmrc.play.http.ws._
 
-object WSHttp extends WSGet with WSPut with WSPost with WSDelete with WSPatch with AppName {
-  override val auditConnector = MicroserviceAuditConnector
+object WSHttp extends WSGet with WSPost with WSDelete with AppName {
+  override val hooks = NoneRequired
 }
 
 object MicroserviceAuditConnector extends AuditConnector {

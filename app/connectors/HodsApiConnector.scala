@@ -30,7 +30,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.play.http.{HttpDelete, HttpGet, HttpPost, HttpResponse}
 
 import model.{ChunkRelease, RcsChunk, RcsDataSet}
-import uk.gov.hmrc.play.audit.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HttpReads.readSeqFromJsonProperty
 
 

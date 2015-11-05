@@ -16,19 +16,13 @@
 
 package unit.connectors
 
-import config.WorldPayDownloaderGlobal
-import connectors.{LockConnectorUtils, LockConnector}
-import org.joda.time.DateTime
+import connectors.{LockConnector, LockConnectorUtils}
 import org.mockito.Matchers
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import play.api.{Configuration, Application}
-import uk.gov.hmrc.play.audit.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.http.HttpResponse
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.http.ws.WSHttp
 import uk.gov.hmrc.play.test.UnitSpec
-import uk.gov.hmrc.time.workingdays.BankHolidaySet
 
 import scala.concurrent.Future
 

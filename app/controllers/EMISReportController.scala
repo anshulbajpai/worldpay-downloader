@@ -20,7 +20,7 @@ import java.util.UUID
 
 import com.jcraft.jsch.JSch
 import com.kenshoo.play.metrics.MetricsRegistry
-import config.{MicroserviceAuditConnector, EnvironmentConfiguration => EC}
+import config.{EnvironmentConfiguration => EC}
 import connectors.{EmisReconcileReportDownloader, HodsApiConnector, SSHConfig}
 import metrics.EmisStatusMetricsPublisher
 import org.joda.time.LocalDate
@@ -29,10 +29,8 @@ import parsers.StreamingEmisReportParser.MerchantTransaction
 import play.api.Logger
 import play.api.mvc.{Action, Result}
 import transformer.EmisReportTransformer
-import uk.gov.hmrc.play.audit.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.SuppressHttpAuditing
+import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
+import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
@@ -60,9 +58,8 @@ object EMISReportController extends EMISReportController with ServicesConfig {
 
   override val hodsApiConnector = new HodsApiConnector {
     override val rcsPaymentsUrl = baseUrl("hodsapi")
-    override val http = new WSGet with WSPost with WSDelete with SuppressHttpAuditing {
-      override def auditConnector: AuditConnector = MicroserviceAuditConnector
-      override def appName: String = "worldpay-downloader"
+    override val http = new WSGet with WSPost with WSDelete with AppName {
+      override val hooks = NoneRequired
     }
     override val metricsRegistry = MetricsRegistry.defaultRegistry
   }

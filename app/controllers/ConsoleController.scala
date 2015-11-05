@@ -23,7 +23,7 @@ import org.joda.time.format.DateTimeFormat
 import play.api.{Play, Logger}
 import play.api.mvc.{Result, Action}
 import schedule.SchedulingService
-import uk.gov.hmrc.play.audit.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrier
 import play.api.Play.current
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import scala.concurrent.ExecutionContext.Implicits.global
