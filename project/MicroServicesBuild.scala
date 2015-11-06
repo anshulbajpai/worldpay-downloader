@@ -19,10 +19,10 @@ private object AppDependencies {
 
   val compile = Seq(
 
-    "uk.gov.hmrc" %% "play-health" % "1.0.0",
-    "uk.gov.hmrc" %% "microservice-bootstrap" % "1.4.0",
-    "uk.gov.hmrc" %% "play-config" % "1.1.0",
-    "uk.gov.hmrc" %% "play-json-logger" % "1.0.0",
+    "uk.gov.hmrc" %% "play-health" % "1.1.0",
+    "uk.gov.hmrc" %% "microservice-bootstrap" % "3.0.0",
+    "uk.gov.hmrc" %% "play-config" % "2.0.1",
+    "uk.gov.hmrc" %% "play-json-logger" % "2.1.0",
     "uk.gov.hmrc" %% "order-id-encoder" % "0.13.0",
 
     "org.apache.httpcomponents" % "httpclient" % "4.3.4",

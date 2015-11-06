@@ -22,7 +22,7 @@ import uk.gov.hmrc.time.workingdays.{BankHolidaySet, BankHoliday}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.play.audit.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 object BankHolidaysConnector {
 

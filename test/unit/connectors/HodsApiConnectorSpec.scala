@@ -26,10 +26,8 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.mock.MockitoSugar
 import play.api.libs.json.Writes
 import play.api.test.{FakeApplication, WithApplication}
-import uk.gov.hmrc.play.audit.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.config.RunMode
-import uk.gov.hmrc.play.http._
+import uk.gov.hmrc.play.http.{HeaderCarrier, _}
 import uk.gov.hmrc.play.test.UnitSpec
 import unit.{SftpConfiguration, WorldpayMerchantConfiguration}
 
@@ -81,7 +79,7 @@ class HodsApiConnectorSpec extends UnitSpec with Eventually with MockitoSugar wi
 
       lazy val hodsApiConnector = new HodsApiConnector {
         override val rcsPaymentsUrl: String = ""
-        override val http: HttpPost with HttpGet with HttpDelete = new HttpPost with HttpGet with HttpDelete with SuppressHttpAuditing {
+        override val http: HttpPost with HttpGet with HttpDelete = new HttpPost with HttpGet with HttpDelete {
 
           override protected def doPost[A](url: String, body: A, headers: Seq[(String,String)])(implicit rds: Writes[A], hc: HeaderCarrier): Future[HttpResponse] =
             if(url.contains("chunk")) {
@@ -100,9 +98,8 @@ class HodsApiConnectorSpec extends UnitSpec with Eventually with MockitoSugar wi
 
           protected def doEmptyPost[A](url: String)(implicit hc: HeaderCarrier) = ???
 
-          override def auditConnector: AuditConnector = ???
+          override val hooks = NoneRequired
 
-          override def appName: String = ???
         }
 
         override lazy val metricsRegistry: MetricRegistry = MetricsRegistry.defaultRegistry

@@ -24,7 +24,7 @@ import model.RcsDataSet
 import org.joda.time.LocalDate
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import play.api.test.{FakeApplication, FakeHeaders, WithApplication}
-import uk.gov.hmrc.play.audit.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.http.{HttpDelete, HttpGet, HttpPost, HttpResponse}
 import uk.gov.hmrc.play.test.UnitSpec
 import unit.{SftpConfiguration, WorldpayMerchantConfiguration}
