@@ -16,17 +16,13 @@
 
 package utils
 
-import org.joda.time.LocalDate
-
 import model.Pence
 
 object Commission {
 
-  val switchDate = new LocalDate(2015, 11, 2)
-  val oldRate = 1.4
-  val newRate = 1.5
+  val rate = 1.5
 
-  def apply(total: Pence, transactionDate: LocalDate): Pence = if (transactionDate.isBefore(switchDate)) calculate(total, oldRate)  else calculate(total, newRate)
+  def apply(total: Pence): Pence = calculate(total, rate)
   private def calculate(total: Pence, rate: Double) = total map (t => math.max(1,  math.round(t / (100 + rate) * rate)))
 
 }

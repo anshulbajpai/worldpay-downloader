@@ -29,8 +29,7 @@ class EmisReportTransformerSpec extends UnitSpec with EmisReportGenerator with L
 
   val emisReportTransformer =  new EmisReportTransformer(merchants)
 
-  val November_1_2015 = new LocalDate(2015, 11, 1)
-  val November_2_2015 = new LocalDate(2015, 11, 2)
+  val November_22_2015 = new LocalDate(2015, 11, 22)
 
   "Transforming a report with a single payment" should {
 
@@ -211,35 +210,10 @@ class EmisReportTransformerSpec extends UnitSpec with EmisReportGenerator with L
       )
     }
 
-    "when the transaction dates are all before 2 November, 2015, create multiple payments items for a credit card transaction, ensuring the right commission (1.4%)" in {
+    "create multiple payments items for a credit card transaction, ensuring the right commission (1.5%)" in {
       val emisReport = createTransactions(
-        merchants.SelfAssessmentForCreditCard.merchantId -> Seq(transaction(amount = 37, ref = "K9876543210K-9999990", date = November_1_2015)),
-        merchants.VatForCreditCard.merchantId            -> Seq(transaction(amount = 2341691, ref = "V1234567891014-Y5RY0", date = November_1_2015))
-      )
-
-      val rcsChunks = emisReportTransformer.toRcsChunks(emisReport, chunkSize = 400).map(_._1).toSeq
-
-      rcsChunks(0).payments.size should be(2)
-
-      val saAccountNumber = merchantMap("sa").account
-
-      rcsChunks(0).payments(0).paymentItems should contain theSameElementsInOrderAs Seq(
-        RcsPaymentItem(transactionType = "26", destinationAccountNumber = saAccountNumber, amount = Pence(36), reference = "9876543210K"),
-        RcsPaymentItem(transactionType = "27", destinationAccountNumber = saAccountNumber, amount = Pence(1), reference = "9876543210K")
-      )
-
-      val vatAccountNumber = merchantMap("vat").account
-
-      rcsChunks(0).payments(1).paymentItems should contain theSameElementsInOrderAs Seq(
-        RcsPaymentItem(transactionType = "26", destinationAccountNumber = vatAccountNumber, amount = Pence(2309360), reference = "1234567891014"),
-        RcsPaymentItem(transactionType = "27", destinationAccountNumber = vatAccountNumber, amount = Pence(32331), reference = "1234567891014")
-      )
-    }
-
-    "when the transaction date are all on 2 November, 2015, create multiple payments items for a credit card transaction, ensuring the right commission (1.5%)" in {
-      val emisReport = createTransactions(
-        merchants.SelfAssessmentForCreditCard.merchantId -> Seq(transaction(amount = 233621, ref = "K9876543210K-9999990", date = November_2_2015)),
-        merchants.VatForCreditCard.merchantId            -> Seq(transaction(amount = 10007900, ref = "V1234567891014-Y5RY0", date = November_2_2015))
+        merchants.SelfAssessmentForCreditCard.merchantId -> Seq(transaction(amount = 233621, ref = "K9876543210K-9999990", date = November_22_2015)),
+        merchants.VatForCreditCard.merchantId            -> Seq(transaction(amount = 10007900, ref = "V1234567891014-Y5RY0", date = November_22_2015))
       )
 
       val rcsChunks = emisReportTransformer.toRcsChunks(emisReport, chunkSize = 400).map(_._1).toSeq
@@ -261,40 +235,6 @@ class EmisReportTransformerSpec extends UnitSpec with EmisReportGenerator with L
       )
     }
 
-
-    "when some of the transaction dates are before 2 November, 2015, and some after, create multiple payments items for a credit card transaction, ensuring the right commission" in {
-      val emisReport = createTransactions(
-        merchants.SelfAssessmentForCreditCard.merchantId -> Seq(transaction(amount = 216119, ref = "K9876543210K-9999990", date = November_1_2015)),
-        merchants.SelfAssessmentForCreditCard.merchantId -> Seq(transaction(amount = 7735894, ref = "K9876543211K-9999990", date = November_1_2015)),
-        merchants.VatForCreditCard.merchantId            -> Seq(transaction(amount = 10007900, ref = "V1234567891014-Y5RY0", date = November_2_2015))
-      )
-
-      val rcsChunks = emisReportTransformer.toRcsChunks(emisReport, chunkSize = 400).map(_._1).toSeq
-
-      rcsChunks(0).payments.size should be(3)
-
-      val saAccountNumber = merchantMap("sa").account
-
-      rcsChunks(0).payments(0).paymentItems should contain theSameElementsInOrderAs Seq(
-        RcsPaymentItem(transactionType = "26", destinationAccountNumber = saAccountNumber, amount = Pence(216119 - 2984), reference = "9876543210K"),
-        RcsPaymentItem(transactionType = "27", destinationAccountNumber = saAccountNumber, amount = Pence(2984), reference = "9876543210K")
-      )
-
-
-      rcsChunks(0).payments(1).paymentItems should contain theSameElementsInOrderAs Seq(
-        RcsPaymentItem(transactionType = "26", destinationAccountNumber = saAccountNumber, amount = Pence(7735894 - 106807), reference = "9876543211K"),
-        RcsPaymentItem(transactionType = "27", destinationAccountNumber = saAccountNumber, amount = Pence(106807), reference = "9876543211K")
-      )
-
-      val vatAccountNumber = merchantMap("vat").account
-
-      rcsChunks(0).payments(2).paymentItems should contain theSameElementsInOrderAs Seq(
-        RcsPaymentItem(transactionType = "26", destinationAccountNumber = vatAccountNumber, amount = Pence(10007900 - 147900), reference = "1234567891014"),
-        RcsPaymentItem(transactionType = "27", destinationAccountNumber = vatAccountNumber, amount = Pence(147900), reference = "1234567891014")
-      )
-    }
-
-
     "convert corporation tax payments" in {
 
       val emisReport = createTransactions(
@@ -315,8 +255,8 @@ class EmisReportTransformerSpec extends UnitSpec with EmisReportGenerator with L
       )
 
       rcsChunks(0).payments(1).paymentItems should contain theSameElementsInOrderAs Seq(
-        RcsPaymentItem(transactionType = "26", destinationAccountNumber = ctNumber, amount = Pence(986), reference = "1067172564A00108A"),
-        RcsPaymentItem(transactionType = "27", destinationAccountNumber = ctNumber, amount = Pence(14), reference = "1067172564A00108A")
+        RcsPaymentItem(transactionType = "26", destinationAccountNumber = ctNumber, amount = Pence(985), reference = "1067172564A00108A"),
+        RcsPaymentItem(transactionType = "27", destinationAccountNumber = ctNumber, amount = Pence(15), reference = "1067172564A00108A")
       )
     }
 
@@ -340,8 +280,8 @@ class EmisReportTransformerSpec extends UnitSpec with EmisReportGenerator with L
       )
 
       rcsChunks(0).payments(1).paymentItems should contain theSameElementsInOrderAs Seq(
-        RcsPaymentItem(transactionType = "26", destinationAccountNumber = epayeNumber, amount = Pence(986), reference = "199PJ397953IN1001"),
-        RcsPaymentItem(transactionType = "27", destinationAccountNumber = epayeNumber, amount = Pence(14), reference = "199PJ397953IN1001")
+        RcsPaymentItem(transactionType = "26", destinationAccountNumber = epayeNumber, amount = Pence(985), reference = "199PJ397953IN1001"),
+        RcsPaymentItem(transactionType = "27", destinationAccountNumber = epayeNumber, amount = Pence(15), reference = "199PJ397953IN1001")
       )
     }
 
@@ -363,8 +303,8 @@ class EmisReportTransformerSpec extends UnitSpec with EmisReportGenerator with L
       )
 
       rcsChunks(0).payments(1).paymentItems should contain theSameElementsInOrderAs Seq(
-        RcsPaymentItem(transactionType = "26", destinationAccountNumber = otherTaxesNumber, amount = Pence(986), reference = "XAXBQF0KNI4K94J"),
-        RcsPaymentItem(transactionType = "27", destinationAccountNumber = otherTaxesNumber, amount = Pence(14), reference = "XAXBQF0KNI4K94J")
+        RcsPaymentItem(transactionType = "26", destinationAccountNumber = otherTaxesNumber, amount = Pence(985), reference = "XAXBQF0KNI4K94J"),
+        RcsPaymentItem(transactionType = "27", destinationAccountNumber = otherTaxesNumber, amount = Pence(15), reference = "XAXBQF0KNI4K94J")
       )
     }
 
@@ -386,8 +326,8 @@ class EmisReportTransformerSpec extends UnitSpec with EmisReportGenerator with L
       )
 
       rcsChunks(0).payments(1).paymentItems should contain theSameElementsInOrderAs Seq(
-        RcsPaymentItem(transactionType = "26", destinationAccountNumber = sdltNumber, amount = Pence(986), reference = "680686481MW"),
-        RcsPaymentItem(transactionType = "27", destinationAccountNumber = sdltNumber, amount = Pence(14), reference = "680686481MW")
+        RcsPaymentItem(transactionType = "26", destinationAccountNumber = sdltNumber, amount = Pence(985), reference = "680686481MW"),
+        RcsPaymentItem(transactionType = "27", destinationAccountNumber = sdltNumber, amount = Pence(15), reference = "680686481MW")
       )
     }
 
